@@ -1,0 +1,81 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.4.32"
+    id("org.jetbrains.kotlin.kapt") version "1.4.32"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.micronaut.application") version "1.5.0"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.32"
+}
+
+version = "0.1"
+group = "com.johnowl"
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.johnowl.*")
+    }
+}
+
+dependencies {
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-runtime")
+    implementation("io.micronaut.kotlin:micronaut-kotlin-extension-functions")
+    implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
+    implementation("javax.annotation:javax.annotation-api")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+
+    // coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+
+    // reactor
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.3")
+    implementation("io.micronaut.reactor:micronaut-reactor")
+
+    // rx2
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2")
+//    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
+
+    runtimeOnly("ch.qos.logback:logback-classic")
+    compileOnly("org.graalvm.nativeimage:svm")
+
+    implementation("io.micronaut:micronaut-validation")
+
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation("io.projectreactor.tools:blockhound:1.0.6.RELEASE")
+}
+
+
+application {
+    mainClass.set("com.johnowl.ApplicationKt")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("11")
+}
+
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+}
+
+import com.bmuschko.gradle.docker.*
+
+dockerfile {
+    baseImage("ghcr.io/graalvm/graalvm-ce:latest")
+}
